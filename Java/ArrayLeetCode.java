@@ -1,7 +1,7 @@
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class ArrayLeetCode {
-
 
     public static int maxProfit(int[] prices) {
         /*
@@ -56,7 +56,7 @@ public class ArrayLeetCode {
     }
 
 
-    public static int morreVotingAlog(int[] nums){
+    public static int morreVotingAlgo(int[] nums){
         int freq=0,ans=0;
         for (int i=0;i< nums.length;i++){
             if(freq==0){
@@ -334,22 +334,240 @@ public class ArrayLeetCode {
 
     }
 
+    static Set<List<Integer>> uniqueSet=new HashSet<>();
     public static List<List<Integer>> combinationSum(int[] candidates, int target) {
+        Arrays.sort(candidates);
+        List<List<Integer>> ans=new ArrayList<>();
+        List<Integer> combination=new ArrayList<>();
+        getAllComSum(candidates,0,target,combination,ans);
 
-
-
-
-        return new ArrayList<>();
+        return ans;
     }
-    public void getAllComSum(int[] arr,int index,List<Integer> combination,List<Integer> ){
+
+    public static void getAllComSum(int[] arr,int index,int target,List<Integer> combination,List<List<Integer>> ans){
         //Base case
-        if(arr.length <+ 0){
+        if(index == arr.length || target<0){
             return ;
         }
-        getAllComSum();
-
-
+        System.out.println(combination);
+        if(target==0){
+          if(!uniqueSet.contains(combination)){
+                ans.add(new ArrayList<>(combination)); // Add a copy of the combination
+               uniqueSet.add(combination);
+           }
+            return;
+        }
+        combination.add(arr[index]);
+        //single choice
+        getAllComSum(arr,index+1,target-arr[index],combination, ans);
+        // multiple
+        getAllComSum(arr,index,target-arr[index],combination,ans);
+        combination.removeLast(); // Backtrack
+        //exclude
+        getAllComSum(arr,index+1,target,combination,ans);
     }
+
+    public static void sortColors(int[] nums) {
+        int mid=0;
+        int low=0;
+        int high=nums.length-1;
+          //Dutch national flag algo(one pass algo)
+        while(mid<=high){
+            if(nums[mid]==0){
+               // swap(nums[low],nums[mid])
+               int temp=nums[mid];
+               nums[mid]=nums[low];
+               nums[low]=temp;
+                mid++;
+                low++;
+            }
+        else if(nums[mid]==1){
+            mid++;
+        }
+          else{
+                //swap(nums[high],nums[mid]
+                int temp=nums[high];
+                nums[high]=nums[mid];
+                nums[mid]=temp;
+                high--;
+            }
+        }
+        System.out.println(Arrays.toString(Arrays.stream(nums).toArray()));
+    }
+
+    public static int maxArea(int[] height) {
+        int ans=Integer.MIN_VALUE;
+//        for(int i=0;i<height.length; i++){
+//            for (int j = i+1; j < height.length; j++) {
+//                int left_b=height[i];
+//                int right_b=height[j];
+//                int high=Math.min(left_b,right_b);
+//                int width=j-i;
+//                int maxWater=high * width;
+//                if(ans<maxWater) ans=maxWater;
+//            }
+//        }
+//        return ans;
+        int left=0;
+        int right=height.length-1;
+        int max_area=0;
+        while(left<right){
+            int high=Math.min(height[left],height[right]);
+            int wid=right-left;
+            int currAre=high*wid;
+            max_area=Math.max(max_area,currAre);
+            if (height[left]<height[right]){
+                left++;
+            }
+            else {
+                right--;
+            }
+        }
+        return max_area;
+    }
+    public static int canCompleteCircuit(int[] gas, int[] cost) {
+        int start=0;
+        int currFuel=0;
+        int totalGas=0;
+        int totalCost=0;
+//        if(Arrays.stream(gas).sum()>=Arrays.stream(cost).sum()) {
+            for (int i = 0; i < gas.length; i++) {
+                totalGas+=gas[i];
+                totalCost+=cost[i];
+                        currFuel=currFuel+gas[i]-cost[i];
+                        if(currFuel<0){
+                            currFuel=0;
+                            start=i+1;
+                       }
+                System.out.println("Value of start "+start);
+                }
+//        }
+//        else {
+//            return -1;
+//        }
+        if(totalGas< totalCost){
+            return -1;
+        }
+
+        return start;
+    }
+
+    public static int longestConsecutive(int[] nums) {
+   //     int count=1;
+   //     int result=1;
+//        Arrays.sort(nums);
+//        for(int i=1;i<nums.length;i++){
+//           if(nums[i] == nums[i-1]){
+//               continue;
+//           }
+//           if(nums[i] == nums[i-1]+1) {
+//               count++;
+//           }else {
+//               count=1;
+//           }
+//           result =Math.max(result,count);
+//
+//        }
+
+        Set<Integer> set= Arrays.stream(nums).boxed().collect(Collectors.toSet());
+       int longestStreak=0;
+        for(int i:set){
+            if(!set.contains(i-1)){
+                int currentNum=i;
+                int currentStreak=1;
+                while(set.contains(currentNum +1 )){
+                    currentStreak ++;
+                    currentNum++;
+                }
+                longestStreak=Math.max(longestStreak,currentStreak);
+            }
+        }
+        return longestStreak;
+    }
+    public static void rotate(int[] nums, int k) {
+     int left=0,right=nums.length-1;
+     k=k%nums.length;
+
+         while(left<right){
+             int temp=nums[left];
+             nums[left]=nums[right];
+             nums[right]=temp;
+             left++;
+             right--;
+         }
+
+         int rleft=k, rright=nums.length-1;
+         while (rleft<rright){
+             int temp=nums[rleft];
+             nums[rleft]=nums[rright];
+             nums[rright]=temp;
+             rleft++;
+             rright--;
+         }
+         int lleft=0, lright=k-1;
+         while (lleft<lright){
+             int temp=nums[lleft];
+             nums[lleft]=nums[lright];
+             nums[lright]=temp;
+             lleft++;
+             lright--;
+         }
+
+        for(int val:nums){
+            System.out.print(val+" ");
+        }
+    }
+    public static int findMaxLength(int[] nums) {
+        //we have to find sum of sub-array =0 for that we are replacing 0 with -1
+        int sum=0;
+        int longestStreak = 0;
+        HashMap<Integer,Integer> myMap=new HashMap<>();
+        // if we have 0,1 array it will result in 0 length to avoid this we're putting 0 in -1 index
+        myMap.put(0,-1);
+        //converting all zeros to -1
+        for(int i=0;i<nums.length; i++){
+            if(nums[i]==0){
+                nums[i]=-1;
+            }
+        }
+
+        for(int i=0;i<nums.length;i++){
+            sum +=nums[i];
+            if(myMap.containsKey(sum)){
+                longestStreak = Math.max(longestStreak,i - myMap.get(sum));
+            }
+            else {
+                myMap.put(sum,i);
+            }
+        }
+        System.out.println(myMap);
+
+        return longestStreak;
+    }
+    public static int subarraySum(int[] nums, int k) {
+        int ans=0;
+        List<Integer> prefixSum=new ArrayList<>();
+        prefixSum.addFirst(nums[0]);
+
+       //prefix sum
+        for(int i=1;i<nums.length;i++){
+            prefixSum.add(i,prefixSum.get(i-1) + nums[i]);
+        }
+
+        Map<Integer,Integer> freq=new HashMap<>();
+        freq.put(0, 1); //When we calculate val = prefixSum.get(j) - k;, if prefixSum.get(j) equals k, then val will be 0.
+
+        //check weather prefix sum contains or not
+        for(int j=0;j<nums.length;j++){
+           int val=prefixSum.get(j)-k;
+            if(freq.containsKey(val)){
+                ans+=freq.get(val);
+            }
+           freq.put(prefixSum.get(j),freq.getOrDefault(prefixSum.get(j),0) +1);
+}
+        return ans;
+    }
+
 
     public static void main(String[] args) {
         int [] prices = {7,1,5,3,6,4};
@@ -366,7 +584,15 @@ public class ArrayLeetCode {
         int [] twoS={2,7,11,15};
         int [] threeS={-1,0,1,2,-1,-4};
         int [] candidates = {2,3,6,7};int target = 7;
-        System.out.println(combinationSum(candidates,target));
+        int [] sortColorArr = {2,0,2,1,1,0};
+        int [] height = {1,8,6,2,5,4,8,3,7};
+        int [] gas = {1,2,3,4,5}; int [] cost = {3,4,5,1,2};
+        int [] conseNums = {0,3,7,2,5,8,4,6,0,1};
+        int [] contArray = {0,1};
+        int [] rotateArr = {-1}; int k = 3;
+        int [] subar = {1,2,3} ; int sumSub = 3;
+        System.out.println("Ans "+subarraySum(subar,sumSub));
+
 
         //insert(intervals,newInterval);
 
